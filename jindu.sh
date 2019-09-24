@@ -13,6 +13,5 @@ done
 }
 jindu &
 cp -a $1 $2
-echo $!
-killall $!
+kill $! >/dev/null
 echo "拷贝完成"
