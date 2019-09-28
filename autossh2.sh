@@ -15,10 +15,10 @@ for i in   90 91 92
      ssh-copy-id  192.168.2.$i
  done
 
-echo "192.168.2.90 client2 
-192.168.2.91 node1
-192.168.2.92 node2
-192.168.2.93 node3" >>/etc/hosts
+echo "192.168.2.90 node1 
+192.168.2.91 node2
+192.168.2.92 node3
+" >>/etc/hosts
 echo "[mon]
 name=mon
 baseurl=ftp://192.168.2.254/ceph/MON
@@ -31,11 +31,7 @@ gpgcheck=0
 name=tools
 baseurl=ftp://192.168.2.254/ceph/Tools
 gpgcheck=0
-[dvd]
-name=dve
-baseurl=ftp://192.168.2.254/centos-1804
-enabled=1
-gpgcheck=0 ">/etc/yum.repos.d/local.repo 
+ ">>/etc/yum.repos.d/local.repo 
 
 for i in  node1 node2 node3 
 do
@@ -53,14 +49,15 @@ if [ ! -d "/root/ceph-cluster" ];then
 mkdir /root/ceph-cluster
 fi
 cd /root/ceph-cluster
-
 yum -y install ceph-deploy
+cd /root/ceph-cluster
 ceph-deploy new node1 node2 node3
 
 for i in node1 node2 node3
 do
  ssh $i "yum -y install ceph-mon ceph-osd ceph-mds ceph-radosgw"
 done
+cd /root/ceph-cluster
 ceph-deploy mon create-initial
 for i in node1 node2 node3
 do
@@ -81,8 +78,9 @@ for i in node1 node2 node3
 do
 scp /etc/udev/rules.d/70-vdb.rules $i:/etc/udev/rules.d/
 done
-
+cd /root/ceph-cluster
 ceph-deploy disk  zap  node1:vdc   node1:vdd  node2:vdc   node2:vdd  node3:vdc   node3:vdd
+cd /root/ceph-cluster
 ceph-deploy osd create  node1:vdc:/dev/vdb1 node1:vdd:/dev/vdb2 node2:vdc:/dev/vdb1 node2:vdd:/dev/vdb2 node3:vdc:/dev/vdb1 node3:vdd:/dev/vdb2
 sleep 20
 ceph  -s
